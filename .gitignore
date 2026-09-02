@@ -1,0 +1,38 @@
+## .NET
+bin/
+obj/
+out/
+
+## Visual Studio
+.vs/
+*.user
+*.suo
+
+## Rider
+.idea/
+
+## VS Code
+.vscode/
+
+## Resultados de build
+*.dll
+*.exe
+*.pdb
+
+## Pruebas y cobertura
+TestResults/
+coverage*.json
+coverage*.xml
+coverage*.info
+docs/coverage/
+
+## Logs
+logs/
+*.log
+
+## Secretos locales
+*.env
+appsettings.*.local.json
+
+## SQL Server / Docker
+sqlserver-data/
