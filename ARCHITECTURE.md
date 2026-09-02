@@ -450,7 +450,7 @@ services:
       ACCEPT_EULA: "Y"
       MSSQL_SA_PASSWORD: "Rent4F4cil!2026"
       MSSQL_PID: Developer
-    ports: ["1433:1433"]
+    ports: ["14330:1433"]
     volumes: [ "sqlserver-data:/var/opt/mssql" ]
     healthcheck:
       test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' || exit 1"]
@@ -485,7 +485,13 @@ Vehicles: Server=sqlserver,1433;Database=RentaFacil_Vehicles;User Id=sa;Password
 Bookings: Server=sqlserver,1433;Database=RentaFacil_Bookings;User Id=sa;Password=…;TrustServerCertificate=True;Encrypt=False
 ```
 
-En desarrollo local fuera de Docker el host es `localhost,1433` (`appsettings.Development.json`).
+En desarrollo local fuera de Docker el host es `localhost,14330` (`appsettings.Development.json`).
+
+> **Sobre el puerto:** el contenedor escucha en `1433` dentro de la red de Docker
+> (por eso las cadenas de arriba usan `sqlserver,1433`), pero se publica hacia el
+> host en `14330` para no chocar con una instancia de SQL Server instalada
+> localmente en la máquina de desarrollo. Desde SSMS se conecta a `localhost,14330`
+> con usuario `sa`.
 
 ### 9.3 Migraciones
 
@@ -616,4 +622,4 @@ docs: agregar arquitectura al README
 
 ---
 
-*Documento de arquitectura v1.1 — pendiente de aprobación antes de generar código.*
+*Documento de arquitectura v1.2 — aprobado. Cambio v1.2: puerto del contenedor publicado en 14330.*
