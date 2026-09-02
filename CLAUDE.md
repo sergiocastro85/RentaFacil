@@ -22,6 +22,9 @@ Si un requisito del documento es ambiguo, pregunta. No inventes la interpretaci�
 ## Stack
 
 - .NET 8, C# 12, `Nullable` habilitado, `TreatWarningsAsErrors`
+- **La máquina tiene instalado el SDK de .NET 10, pero el TFM del proyecto es
+  `net8.0`.** Pasa siempre `-f net8.0` en `dotnet new` e instala los paquetes NuGet
+  de Microsoft en versión `8.x`. Ningún `.csproj` puede quedar en `net10.0`.
 - EF Core 8 + SQL Server 2022 (contenedor)
 - MediatR, FluentValidation, Serilog, Polly
 - xUnit + Moq + FluentAssertions + coverlet
