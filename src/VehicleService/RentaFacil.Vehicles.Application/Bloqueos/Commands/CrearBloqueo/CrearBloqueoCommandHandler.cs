@@ -83,6 +83,7 @@ public sealed class CrearBloqueoCommandHandler : IRequestHandler<CrearBloqueoCom
             bloqueo.Id,
             vehiculo.Id,
             vehiculo.Placa.Valor,
+            vehiculo.Tipo,
             vehiculo.TarifaDiaria.Monto,
             bloqueo.Periodo.FechaInicio,
             bloqueo.Periodo.FechaFin);

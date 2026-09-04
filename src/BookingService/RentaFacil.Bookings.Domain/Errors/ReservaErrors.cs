@@ -24,6 +24,11 @@ public static class ReservaErrors
         $"El vehículo {vehiculoId} no está disponible en el periodo solicitado.",
         ErrorType.Conflict);
 
+    public static Error VehiculoNoEncontrado(Guid vehiculoId) => new(
+        "Reserva.VehiculoNoEncontrado",
+        $"No existe un vehículo con id {vehiculoId} en VehicleService.",
+        ErrorType.NotFound);
+
     public static readonly Error FalloComunicacionVehicleService = new(
         "Reserva.FalloComunicacionVehicleService",
         "No fue posible comunicarse con el servicio de vehículos.",
