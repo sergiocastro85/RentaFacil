@@ -85,6 +85,7 @@ public sealed class CrearBloqueoCommandHandler : IRequestHandler<CrearBloqueoCom
             vehiculo.Placa.Valor,
             vehiculo.Tipo,
             vehiculo.TarifaDiaria.Monto,
+            vehiculo.TarifaDiaria.Moneda,
             bloqueo.Periodo.FechaInicio,
             bloqueo.Periodo.FechaFin);
     }

@@ -53,7 +53,7 @@ internal sealed class VehicleCatalogHttpClient : IVehicleCatalogService
         if (response.IsSuccessStatusCode)
         {
             var bloqueo = await response.Content.ReadFromJsonAsync<BloqueoHttpResponse>(JsonOptions, cancellationToken);
-            return new CupoReservadoDto(bloqueo!.BloqueoId, bloqueo.Placa, bloqueo.Tipo, bloqueo.TarifaDiaria);
+            return new CupoReservadoDto(bloqueo!.BloqueoId, bloqueo.Placa, bloqueo.Tipo, bloqueo.TarifaDiaria, bloqueo.Moneda);
         }
 
         return Result.Failure<CupoReservadoDto>(TraducirError(response.StatusCode, vehiculoId));
@@ -136,6 +136,7 @@ internal sealed class VehicleCatalogHttpClient : IVehicleCatalogService
         string Placa,
         TipoVehiculo Tipo,
         decimal TarifaDiaria,
+        string Moneda,
         DateOnly FechaInicio,
         DateOnly FechaFin);
 }

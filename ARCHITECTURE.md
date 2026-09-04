@@ -301,7 +301,7 @@ Todos los errores salen como **RFC 7807 `ProblemDetails`** desde el middleware g
 | Método | Ruta | Descripción | Códigos |
 |---|---|---|---|
 | `POST` | `/api/clientes` | Registrar cliente | 201, 400, 409 |
-| `POST` | `/api/reservas` | Crear reserva asociando cliente y vehículo | 201, 400, 404, 409, 503 |
+| `POST` | `/api/reservas` | Crear reserva asociando cliente y vehículo | 201, 400, 404, 409, 500, **503 (VehicleService no responde)** |
 | `GET` | `/api/clientes/{clienteId}/reservas` | Historial de reservas del cliente | 200, 404 |
 
 Los dos endpoints de bloqueos existen únicamente para sostener el flujo de creación de reserva; no son funcionalidad de cara al usuario final.

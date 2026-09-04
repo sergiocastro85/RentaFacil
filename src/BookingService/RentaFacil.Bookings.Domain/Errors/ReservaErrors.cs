@@ -33,4 +33,9 @@ public static class ReservaErrors
         "Reserva.FalloComunicacionVehicleService",
         "No fue posible comunicarse con el servicio de vehículos.",
         ErrorType.Failure);
+
+    public static readonly Error FalloAlPersistir = new(
+        "Reserva.FalloAlPersistir",
+        "No fue posible guardar la reserva. Se liberó el cupo reservado en VehicleService.",
+        ErrorType.Failure);
 }

@@ -8,5 +8,6 @@ public sealed record BloqueoResponse(
     string Placa,
     TipoVehiculo Tipo,
     decimal TarifaDiaria,
+    string Moneda,
     DateOnly FechaInicio,
     DateOnly FechaFin);
