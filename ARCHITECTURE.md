@@ -207,7 +207,7 @@ Relación: `Vehiculo 1 ──── * BloqueoDisponibilidad`.
 | `Id` | `Guid` | PK |
 | `ClienteId` | `Guid` | FK → `Clientes`, `OnDelete: Restrict` |
 | `VehiculoId` | `Guid` | **referencia lógica** al otro contexto, sin FK física |
-| `TipoVehiculo` | `int` | copia denormalizada para el historial y el reporte |
+| `TipoVehiculo` | `TipoVehiculo` (enum) | copia denormalizada para el historial y el reporte; persistido como `int` |
 | `PlacaVehiculo` | `string(10)` | snapshot al momento de reservar |
 | `Periodo` | `Periodo` (VO) | owned type |
 | `TarifaDiariaAplicada` | `Dinero` (VO) | snapshot: la tarifa puede cambiar después |
@@ -256,7 +256,7 @@ VehiculoResponse              { id, placa, tipo, marca, modelo, anio, tarifaDiar
 ConsultaDisponibilidadRequest { tipo, fechaInicio, fechaFin }          ← query string
 VehiculoDisponibleDto         { id, placa, tipo, marca, modelo, tarifaDiaria }
 CrearBloqueoRequest           { fechaInicio, fechaFin, referenciaExternaId }
-BloqueoResponse               { bloqueoId, vehiculoId, placa, tarifaDiaria, fechaInicio, fechaFin }
+BloqueoResponse               { bloqueoId, vehiculoId, placa, tipo, tarifaDiaria, fechaInicio, fechaFin }
 ```
 
 ### BookingService
