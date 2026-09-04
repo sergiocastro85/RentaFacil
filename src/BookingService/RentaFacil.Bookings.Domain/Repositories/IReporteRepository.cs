@@ -8,7 +8,10 @@ public interface IReporteRepository
 
     Task AgregarAsync(ReporteReservasDiarias reporte, CancellationToken cancellationToken);
 
-    Task<IReadOnlyCollection<Reserva>> ObtenerReservasEnRangoAsync(
+    // Agregación traducida a SQL (GroupBy + Count/Sum + COUNT DISTINCT): el handler de
+    // GenerarReporteDiario no trae reservas completas a memoria para sumarlas con LINQ to
+    // Objects.
+    Task<ReporteAgregado> ObtenerAgregadoEnRangoAsync(
         DateTime desde,
         DateTime hasta,
         CancellationToken cancellationToken);

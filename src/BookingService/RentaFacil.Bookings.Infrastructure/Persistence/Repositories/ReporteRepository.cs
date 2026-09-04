@@ -26,14 +26,28 @@ internal sealed class ReporteRepository : IReporteRepository
         await _dbContext.ReportesReservasDiarias.AddAsync(reporte, cancellationToken);
     }
 
-    public async Task<IReadOnlyCollection<Reserva>> ObtenerReservasEnRangoAsync(
+    public async Task<ReporteAgregado> ObtenerAgregadoEnRangoAsync(
         DateTime desde,
         DateTime hasta,
         CancellationToken cancellationToken)
     {
-        return await _dbContext.Reservas
+        var reservasEnRango = _dbContext.Reservas
             .AsNoTracking()
-            .Where(reserva => reserva.FechaCreacion >= desde && reserva.FechaCreacion < hasta)
+            .Where(reserva => reserva.FechaCreacion >= desde && reserva.FechaCreacion < hasta);
+
+        var desglosePorTipo = await reservasEnRango
+            .GroupBy(reserva => reserva.TipoVehiculo)
+            .Select(grupo => new DesgloseTipoVehiculo(
+                grupo.Key,
+                grupo.Count(),
+                grupo.Sum(reserva => reserva.ValorTotal.Monto)))
             .ToListAsync(cancellationToken);
+
+        var clientesUnicos = await reservasEnRango
+            .Select(reserva => reserva.ClienteId)
+            .Distinct()
+            .CountAsync(cancellationToken);
+
+        return new ReporteAgregado(clientesUnicos, desglosePorTipo);
     }
 }
