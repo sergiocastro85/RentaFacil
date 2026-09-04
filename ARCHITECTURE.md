@@ -521,6 +521,13 @@ Configuración de EF Core:
 - `decimal(18,2)` explícito para todo monto.
 - `DateTime` siempre UTC, columnas `datetime2`.
 
+> **Limitación conocida de EF Core:** no es posible declarar por Fluent API un índice
+> que combine una columna de la entidad propietaria con propiedades de un owned type
+> mapeado a la misma tabla (dotnet/efcore#11336). El índice
+> `IX_Bloqueos_VehiculoId_FechaInicio_FechaFin` se agrega con `migrationBuilder.CreateIndex`
+> directamente en la migración. Al regenerar migraciones hay que verificar que ese índice
+> siga presente, porque el modelo C# no lo conoce.
+
 ---
 
 ## 10. Estrategia de pruebas

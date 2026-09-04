@@ -10,6 +10,31 @@ public sealed class Vehiculo : AggregateRoot
 {
     private readonly List<BloqueoDisponibilidad> _bloqueos = [];
 
+    // EF Core no puede enlazar por constructor una propiedad que es un owned type
+    // (TarifaDiaria): "Navigations to related entities, including references to
+    // owned types, cannot be bound". Este constructor, sin ese parámetro, es el
+    // que EF Core usa para materializar; TarifaDiaria se asigna aparte mediante
+    // el constructor de dominio de abajo o por el propio EF vía el backing field.
+#pragma warning disable CS8618 // TarifaDiaria la asigna el constructor de dominio (abajo) o EF Core vía el backing field.
+    private Vehiculo(
+        Guid id,
+        Placa placa,
+        TipoVehiculo tipo,
+        string marca,
+        string modelo,
+        int anio,
+        DateTime fechaRegistro)
+        : base(id)
+    {
+        Placa = placa;
+        Tipo = tipo;
+        Marca = marca;
+        Modelo = modelo;
+        Anio = anio;
+        FechaRegistro = fechaRegistro;
+    }
+#pragma warning restore CS8618
+
     private Vehiculo(
         Guid id,
         Placa placa,
@@ -19,15 +44,9 @@ public sealed class Vehiculo : AggregateRoot
         int anio,
         Dinero tarifaDiaria,
         DateTime fechaRegistro)
-        : base(id)
+        : this(id, placa, tipo, marca, modelo, anio, fechaRegistro)
     {
-        Placa = placa;
-        Tipo = tipo;
-        Marca = marca;
-        Modelo = modelo;
-        Anio = anio;
         TarifaDiaria = tarifaDiaria;
-        FechaRegistro = fechaRegistro;
     }
 
     public Placa Placa { get; }
