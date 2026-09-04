@@ -28,4 +28,19 @@ public static class VehiculoErrors
         "Vehiculo.NoDisponible",
         $"El vehículo {placa} ya tiene una reserva entre {fechaInicio:yyyy-MM-dd} y {fechaFin:yyyy-MM-dd}.",
         ErrorType.Conflict);
+
+    public static Error PlacaDuplicada(string placa) => new(
+        "Vehiculo.PlacaDuplicada",
+        $"Ya existe un vehículo registrado con la placa {placa}.",
+        ErrorType.Conflict);
+
+    public static Error VehiculoNoEncontrado(Guid vehiculoId) => new(
+        "Vehiculo.NoEncontrado",
+        $"No existe un vehículo con id {vehiculoId}.",
+        ErrorType.NotFound);
+
+    public static Error BloqueoNoEncontrado(Guid referenciaExternaId) => new(
+        "Vehiculo.BloqueoNoEncontrado",
+        $"No existe un bloqueo con referencia externa {referenciaExternaId}.",
+        ErrorType.NotFound);
 }

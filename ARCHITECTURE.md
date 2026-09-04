@@ -174,7 +174,7 @@ Api ──► Application ──► Domain ──► SharedKernel
 | Campo | Tipo | Notas |
 |---|---|---|
 | `Id` | `Guid` | PK |
-| `VehiculoId` | `Guid` | FK → `Vehiculos`, `OnDelete: Restrict` |
+| `VehiculoId` | `Guid` | FK → `Vehiculos`, `DeleteBehavior.ClientCascade` (DDL: `NO ACTION`; el borrado del hijo lo gobierna el agregado)|
 | `Periodo` | `Periodo` (VO) | owned type → columnas `FechaInicio`, `FechaFin` (`date`) |
 | `ReferenciaExternaId` | `Guid` | id de la reserva en el contexto Booking |
 | `FechaCreacion` | `DateTime` (UTC) | |
@@ -242,6 +242,11 @@ Relación: `Vehiculo 1 ──── * BloqueoDisponibilidad`.
 ## 4. DTOs
 
 **Convención:** `*Request` (entrada API) → `*Command`/`*Query` (Application) → `*Response`/`*Dto` (salida). Las entidades de dominio nunca cruzan la frontera HTTP.
+> Los endpoints bindean directamente al `Command`/`Query` cuando el contrato HTTP
+> coincide 1:1 con él: el command **es** el DTO de entrada entre `Api` y `Application`,
+> y una clase `Request` intermedia sería una copia sin valor. Solo se define un
+> `*Request` propio cuando el body no coincide con el command, como en
+> `CrearBloqueoRequest`, donde `vehiculoId` viene de la ruta.
 
 ### VehicleService
 

@@ -60,10 +60,17 @@ internal sealed class VehiculoConfiguration : IEntityTypeConfiguration<Vehiculo>
             .HasColumnType("datetime2")
             .IsRequired();
 
+        // ClientCascade (no Cascade ni Restrict): en la base de datos la FK sigue siendo
+        // "ON DELETE NO ACTION" -- el mismo DDL que generaría Restrict en SQL Server, así
+        // que se respeta "OnDelete: Restrict" de ARCHITECTURE.md §3.1 -- pero el change
+        // tracker de EF Core sí borra la fila huérfana cuando Vehiculo.LiberarBloqueo() la
+        // quita de la colección en memoria. Con Restrict a secas, EF lanza
+        // InvalidOperationException porque la FK es obligatoria y no sabe qué hacer con un
+        // hijo que perdió su padre sin que la base tenga permiso de borrar en cascada.
         builder.HasMany(vehiculo => vehiculo.Bloqueos)
             .WithOne()
             .HasForeignKey(bloqueo => bloqueo.VehiculoId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.ClientCascade);
 
         builder.Navigation(vehiculo => vehiculo.Bloqueos)
             .UsePropertyAccessMode(PropertyAccessMode.Field);
