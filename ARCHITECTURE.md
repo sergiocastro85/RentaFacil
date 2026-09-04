@@ -561,6 +561,7 @@ Solo pruebas unitarias, según el alcance definido.
 | 12 | **Serilog + `ProblemDetails`** | `Console.WriteLine` y errores ad-hoc | Logging estructurado y errores consistentes con RFC 7807 |
 | 13 | **VOs duplicados por contexto** | Moverlos al `SharedKernel` | Compartir modelos entre bounded contexts es la vía rápida a un monolito distribuido |
 | 14 | **Sin autenticación** | JWT + Identity | Fuera del alcance del enunciado. Se documenta dónde entraría |
+| 15 | **El dominio recibe `fechaActual` como parámetro** en `Vehiculo.Crear` y `AgregarBloqueo` | Inyectar `IDateTimeProvider` en las entidades | Una entidad de dominio no debe tener dependencias inyectadas: recibe todo lo que necesita para decidir. Mantiene el dominio determinista y los tests sin mocks de reloj. La capa Application resuelve el "ahora" vía `IDateTimeProvider` |
 
 ### Patrones de diseño aplicados (mapeo al enunciado)
 
