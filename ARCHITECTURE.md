@@ -466,22 +466,43 @@ services:
   vehicle-service:
     build: { context: ., dockerfile: src/VehicleService/RentaFacil.Vehicles.Api/Dockerfile }
     ports: ["5001:8080"]
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ConnectionStrings__Vehicles: "Server=sqlserver,1433;Database=RentaFacil_Vehicles;User Id=sa;Password=…;TrustServerCertificate=True;Encrypt=False"
     depends_on: { sqlserver: { condition: service_healthy } }
 
   booking-service:
     build: { context: ., dockerfile: src/BookingService/RentaFacil.Bookings.Api/Dockerfile }
     ports: ["5002:8080"]
     environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ConnectionStrings__Bookings: "Server=sqlserver,1433;Database=RentaFacil_Bookings;User Id=sa;Password=…;TrustServerCertificate=True;Encrypt=False"
       VehicleService__BaseUrl: "http://vehicle-service:8080"
     depends_on: { sqlserver: { condition: service_healthy } }
 
   reporting-worker:
     build: { context: ., dockerfile: src/BookingService/RentaFacil.Reporting.Worker/Dockerfile }
+    environment:
+      DOTNET_ENVIRONMENT: "Development"
+      ConnectionStrings__Bookings: "Server=sqlserver,1433;Database=RentaFacil_Bookings;User Id=sa;Password=…;TrustServerCertificate=True;Encrypt=False"
     depends_on: { sqlserver: { condition: service_healthy } }
 
 volumes:
   sqlserver-data:
 ```
+
+> **Las tres apps corren en `Development` dentro de Compose.** Es un entorno de
+> desarrollo local por definición (`docker-compose.yml` no es lo que se usaría
+> para desplegar en un entorno real), así que se fija `ASPNETCORE_ENVIRONMENT`/
+> `DOTNET_ENVIRONMENT=Development` para que `docker compose up` deje el sistema
+> listo para usar de un solo comando: migraciones aplicadas y Swagger expuesto
+> (ambos detrás de `if (Environment.IsDevelopment())` en `Program.cs`, ver
+> §9.3). Como consecuencia, `ConnectionStrings__*` se repite explícitamente en
+> cada servicio: `appsettings.Development.json` trae `Server=localhost,14330`
+> (pensado para correr fuera de Docker, ver §9.2), y sin este override la app
+> intentaría resolver `localhost` dentro de su propio contenedor en vez del
+> contenedor `sqlserver`. La variable de entorno tiene prioridad sobre
+> `appsettings.{Environment}.json` en el orden de configuración de .NET.
 
 ### 9.2 Cadenas de conexión
 
@@ -516,7 +537,7 @@ dotnet ef migrations add InicialReservas \
   -o Persistence/Migrations
 ```
 
-**Aplicación**: en `Development` cada API ejecuta `Database.MigrateAsync()` al arrancar, con `EnableRetryOnFailure` porque SQL Server tarda en aceptar conexiones aunque el contenedor ya esté "up". En producción esto sería un job de migración separado; se documenta así en el README.
+**Aplicación**: en `Development` cada API ejecuta `Database.MigrateAsync()` al arrancar, con `EnableRetryOnFailure` porque SQL Server tarda en aceptar conexiones aunque el contenedor ya esté "up". Como Compose fija `Development` (§9.1), esto corre también con `docker compose up`, sin pasos manuales. En un despliegue a un entorno real —fuera del alcance de esta prueba— esto sería un job de migración separado, ejecutado una vez antes de arrancar las APIs en `Production`.
 
 Configuración de EF Core:
 - Fluent API en clases `IEntityTypeConfiguration<T>`, cero Data Annotations.
@@ -635,4 +656,4 @@ docs: agregar arquitectura al README
 
 ---
 
-*Documento de arquitectura v1.2 — aprobado. Cambio v1.2: puerto del contenedor publicado en 14330.*
+*Documento de arquitectura v1.3 — aprobado. Cambio v1.3: las apps corren en `Development` dentro de Compose (§9.1), para que `docker compose up` deje el sistema listo sin pasos manuales. Cambio v1.2: puerto del contenedor publicado en 14330.*

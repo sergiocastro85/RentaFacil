@@ -17,17 +17,29 @@ services:
   vehicle-service:
     build: { context: ., dockerfile: src/VehicleService/RentaFacil.Vehicles.Api/Dockerfile }
     ports: ["5001:8080"]
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      # appsettings.Development.json trae "Server=localhost,14330" (pensado para
+      # correr fuera de Docker); se sobrescribe aquí para seguir usando el nombre
+      # de servicio de la red de Compose. Las variables de entorno tienen
+      # prioridad sobre appsettings.{Environment}.json.
+      ConnectionStrings__Vehicles: "Server=sqlserver,1433;Database=RentaFacil_Vehicles;User Id=sa;Password=Rent4F4cil!2026;TrustServerCertificate=True;Encrypt=False"
     depends_on: { sqlserver: { condition: service_healthy } }
 
   booking-service:
     build: { context: ., dockerfile: src/BookingService/RentaFacil.Bookings.Api/Dockerfile }
     ports: ["5002:8080"]
     environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ConnectionStrings__Bookings: "Server=sqlserver,1433;Database=RentaFacil_Bookings;User Id=sa;Password=Rent4F4cil!2026;TrustServerCertificate=True;Encrypt=False"
       VehicleService__BaseUrl: "http://vehicle-service:8080"
     depends_on: { sqlserver: { condition: service_healthy } }
 
   reporting-worker:
     build: { context: ., dockerfile: src/BookingService/RentaFacil.Reporting.Worker/Dockerfile }
+    environment:
+      DOTNET_ENVIRONMENT: "Development"
+      ConnectionStrings__Bookings: "Server=sqlserver,1433;Database=RentaFacil_Bookings;User Id=sa;Password=Rent4F4cil!2026;TrustServerCertificate=True;Encrypt=False"
     depends_on: { sqlserver: { condition: service_healthy } }
 
 volumes:

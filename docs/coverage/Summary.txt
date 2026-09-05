@@ -1,27 +1,27 @@
 Summary
-  Generated on: 4/09/2026 - 5:43:51 p. m.
-  Coverage date: 4/09/2026 - 5:43:38 p. m. - 4/09/2026 - 5:43:46 p. m.
+  Generated on: 5/09/2026 - 6:52:49 a. m.
+  Coverage date: 5/09/2026 - 6:52:32 a. m. - 5/09/2026 - 6:52:43 a. m.
   Parser: MultiReport (5x Cobertura)
   Assemblies: 6
   Classes: 72
   Files: 72
-  Line coverage: 61.2%
-  Covered lines: 1297
-  Uncovered lines: 822
-  Coverable lines: 2119
-  Total lines: 3323
-  Branch coverage: 78.1% (250 of 320)
-  Covered branches: 250
-  Total branches: 320
-  Method coverage: 70.3% (221 of 314)
-  Full method coverage: 68.7% (216 of 314)
-  Covered methods: 221
-  Fully covered methods: 216
+  Line coverage: 63%
+  Covered lines: 1349
+  Uncovered lines: 790
+  Coverable lines: 2139
+  Total lines: 3347
+  Branch coverage: 78% (256 of 328)
+  Covered branches: 256
+  Total branches: 328
+  Method coverage: 71.6% (225 of 314)
+  Full method coverage: 70% (220 of 314)
+  Covered methods: 225
+  Fully covered methods: 220
   Total methods: 314
 
-RentaFacil.Bookings.Application                                                                                                                   88.3%
+RentaFacil.Bookings.Application                                                                                                                   92.9%
   RentaFacil.Bookings.Application.Abstractions.CupoReservadoDto                                                                                    100%
-  RentaFacil.Bookings.Application.Behaviors.LoggingBehavior<T1, T2>                                                                                  0%
+  RentaFacil.Bookings.Application.Behaviors.LoggingBehavior<T1, T2>                                                                                100%
   RentaFacil.Bookings.Application.Behaviors.ValidationBehavior<T1, T2>                                                                             100%
   RentaFacil.Bookings.Application.Clientes.Commands.RegistrarCliente.RegistrarClienteCommand                                                       100%
   RentaFacil.Bookings.Application.Clientes.Commands.RegistrarCliente.RegistrarClienteCommandHandler                                                100%
@@ -77,8 +77,8 @@ RentaFacil.SharedKernel                                                         
   RentaFacil.SharedKernel.Results.Result                                                                                                          77.7%
   RentaFacil.SharedKernel.Results.Result<T>                                                                                                        100%
 
-RentaFacil.Vehicles.Application                                                                                                                   84.7%
-  RentaFacil.Vehicles.Application.Behaviors.LoggingBehavior<T1, T2>                                                                                  0%
+RentaFacil.Vehicles.Application                                                                                                                     91%
+  RentaFacil.Vehicles.Application.Behaviors.LoggingBehavior<T1, T2>                                                                                100%
   RentaFacil.Vehicles.Application.Behaviors.ValidationBehavior<T1, T2>                                                                             100%
   RentaFacil.Vehicles.Application.Bloqueos.Commands.CrearBloqueo.CrearBloqueoCommand                                                               100%
   RentaFacil.Vehicles.Application.Bloqueos.Commands.CrearBloqueo.CrearBloqueoCommandHandler                                                        100%

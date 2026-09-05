@@ -1,0 +1,325 @@
+{
+  "info": {
+    "_postman_id": "dc8e692c-b3a4-43ae-a622-e9b80ecd3dc7",
+    "name": "RentaFacil",
+    "description": "Flujo end-to-end de RentaFácil S.A.S.: registrar vehículo, registrar cliente, crear reserva, consultar historial y demostrar el rechazo por solapamiento (409). Los endpoints de bloqueos de VehicleService se incluyen aparte y están marcados como uso interno: en el flujo real los invoca BookingService, no un cliente HTTP externo.\n\nEjecuta la colección completa con el Collection Runner, en orden (VehicleService y luego BookingService); no requiere editar nada a mano.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Calcula ventanas de fechas relativas a \"hoy\" (RN-P02: fechaInicio no puede ser anterior a hoy UTC).",
+          "// Se recalculan en cada request para que la colección funcione sin importar cuándo se ejecute.",
+          "function formatoFecha(fecha) {",
+          "    return fecha.toISOString().slice(0, 10);",
+          "}",
+          "",
+          "function sumarDias(dias) {",
+          "    const fecha = new Date();",
+          "    fecha.setUTCDate(fecha.getUTCDate() + dias);",
+          "    return formatoFecha(fecha);",
+          "}",
+          "",
+          "pm.collectionVariables.set('fechaInicioReserva', sumarDias(5));",
+          "pm.collectionVariables.set('fechaFinReserva', sumarDias(10));",
+          "pm.collectionVariables.set('fechaInicioBloqueoDemo', sumarDias(40));",
+          "pm.collectionVariables.set('fechaFinBloqueoDemo', sumarDias(45));",
+          "",
+          "if (!pm.collectionVariables.get('referenciaExternaDemo')) {",
+          "    pm.collectionVariables.set('referenciaExternaDemo', pm.variables.replaceIn('{{$guid}}'));",
+          "}",
+          "",
+          "// Placa: 5-10 caracteres alfanuméricos (RN-V01). 'TST' + 6 dígitos cabe en el límite",
+          "// y evita chocar con el índice único UX_Vehiculos_Placa al repetir la corrida.",
+          "if (!pm.collectionVariables.get('placaDemo')) {",
+          "    pm.collectionVariables.set('placaDemo', 'TST' + Date.now().toString().slice(-6));",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    { "key": "vehiculoId", "value": "" },
+    { "key": "clienteId", "value": "" },
+    { "key": "reservaId", "value": "" },
+    { "key": "referenciaExternaDemo", "value": "" },
+    { "key": "fechaInicioReserva", "value": "" },
+    { "key": "fechaFinReserva", "value": "" },
+    { "key": "fechaInicioBloqueoDemo", "value": "" },
+    { "key": "fechaFinBloqueoDemo", "value": "" },
+    { "key": "placaDemo", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "VehicleService",
+      "item": [
+        {
+          "name": "Registrar vehículo",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"placa\": \"{{placaDemo}}\",\n  \"tipo\": \"SUV\",\n  \"marca\": \"Toyota\",\n  \"modelo\": \"RAV4\",\n  \"anio\": 2024,\n  \"tarifaDiaria\": 150000,\n  \"moneda\": \"COP\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{vehicleServiceBaseUrl}}/api/vehiculos",
+              "host": [ "{{vehicleServiceBaseUrl}}" ],
+              "path": [ "api", "vehiculos" ]
+            },
+            "description": "RN-V01/V02/V03. La placa (`placaDemo`, generada en el pre-request script de la colección) evita chocar con el índice único `UX_Vehiculos_Placa` al repetir la corrida."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) {",
+                  "    const body = pm.response.json();",
+                  "    pm.test('la respuesta trae id', () => pm.expect(body.id).to.be.a('string').and.not.empty);",
+                  "    pm.collectionVariables.set('vehiculoId', body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Consultar disponibilidad",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{vehicleServiceBaseUrl}}/api/vehiculos/disponibilidad?tipo=SUV&fechaInicio={{fechaInicioReserva}}&fechaFin={{fechaFinReserva}}",
+              "host": [ "{{vehicleServiceBaseUrl}}" ],
+              "path": [ "api", "vehiculos", "disponibilidad" ],
+              "query": [
+                { "key": "tipo", "value": "SUV" },
+                { "key": "fechaInicio", "value": "{{fechaInicioReserva}}" },
+                { "key": "fechaFin", "value": "{{fechaFinReserva}}" }
+              ]
+            },
+            "description": "RN-V04. Debe incluir el vehículo recién registrado, porque todavía no tiene bloqueos en este periodo."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "const vehiculoId = pm.collectionVariables.get('vehiculoId');",
+                  "pm.test('el vehiculo registrado aparece disponible', () => {",
+                  "    pm.expect(body.some(v => v.id === vehiculoId)).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear bloqueo (uso interno)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaInicio\": \"{{fechaInicioBloqueoDemo}}\",\n  \"fechaFin\": \"{{fechaFinBloqueoDemo}}\",\n  \"referenciaExternaId\": \"{{referenciaExternaDemo}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{vehicleServiceBaseUrl}}/api/vehiculos/{{vehiculoId}}/bloqueos",
+              "host": [ "{{vehicleServiceBaseUrl}}" ],
+              "path": [ "api", "vehiculos", "{{vehiculoId}}", "bloqueos" ]
+            },
+            "description": "USO INTERNO: en producción este endpoint lo llama BookingService dentro de POST /api/reservas (§7.2 de ARCHITECTURE.md), nunca un cliente externo. Se incluye aquí solo para poder demostrarlo de forma aislada. Usa una ventana de fechas separada de la reserva principal para no interferir con ella, y se libera con la siguiente petición."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) {",
+                  "    const body = pm.response.json();",
+                  "    pm.test('la respuesta trae bloqueoId', () => pm.expect(body.bloqueoId).to.be.a('string').and.not.empty);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Liberar bloqueo (uso interno)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{vehicleServiceBaseUrl}}/api/vehiculos/{{vehiculoId}}/bloqueos/{{referenciaExternaDemo}}",
+              "host": [ "{{vehicleServiceBaseUrl}}" ],
+              "path": [ "api", "vehiculos", "{{vehiculoId}}", "bloqueos", "{{referenciaExternaDemo}}" ]
+            },
+            "description": "USO INTERNO: compensación del paso 5b de §7.2 (por ejemplo, si la reserva falla al persistir después de reservar el cupo). Libera el bloqueo de demostración creado en la petición anterior."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('204 No Content', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BookingService",
+      "item": [
+        {
+          "name": "Registrar cliente",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipoDocumento\": \"CC\",\n  \"numeroDocumento\": \"{{$timestamp}}\",\n  \"nombreCompleto\": \"Ana Test\",\n  \"email\": \"ana.test.{{$timestamp}}@example.com\",\n  \"telefono\": \"3001234567\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{bookingServiceBaseUrl}}/api/clientes",
+              "host": [ "{{bookingServiceBaseUrl}}" ],
+              "path": [ "api", "clientes" ]
+            },
+            "description": "El documento incluye {{$timestamp}} para no chocar con el índice único de `Documento` al repetir la corrida."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) {",
+                  "    const body = pm.response.json();",
+                  "    pm.test('la respuesta trae id', () => pm.expect(body.id).to.be.a('string').and.not.empty);",
+                  "    pm.collectionVariables.set('clienteId', body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear reserva",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clienteId\": \"{{clienteId}}\",\n  \"vehiculoId\": \"{{vehiculoId}}\",\n  \"fechaInicio\": \"{{fechaInicioReserva}}\",\n  \"fechaFin\": \"{{fechaFinReserva}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{bookingServiceBaseUrl}}/api/reservas",
+              "host": [ "{{bookingServiceBaseUrl}}" ],
+              "path": [ "api", "reservas" ]
+            },
+            "description": "Dispara el flujo de §7.2: BookingService reserva el cupo en VehicleService (POST /api/vehiculos/{id}/bloqueos) antes de persistir la reserva localmente."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) {",
+                  "    const body = pm.response.json();",
+                  "    pm.test('la respuesta trae id y valorTotal', () => {",
+                  "        pm.expect(body.id).to.be.a('string').and.not.empty;",
+                  "        pm.expect(body.valorTotal).to.be.a('number');",
+                  "    });",
+                  "    pm.collectionVariables.set('reservaId', body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener historial del cliente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{bookingServiceBaseUrl}}/api/clientes/{{clienteId}}/reservas",
+              "host": [ "{{bookingServiceBaseUrl}}" ],
+              "path": [ "api", "clientes", "{{clienteId}}", "reservas" ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "const reservaId = pm.collectionVariables.get('reservaId');",
+                  "pm.test('la reserva creada aparece en el historial', () => {",
+                  "    pm.expect(body.some(r => r.id === reservaId)).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear reserva - solapada (409 esperado)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clienteId\": \"{{clienteId}}\",\n  \"vehiculoId\": \"{{vehiculoId}}\",\n  \"fechaInicio\": \"{{fechaInicioReserva}}\",\n  \"fechaFin\": \"{{fechaFinReserva}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{bookingServiceBaseUrl}}/api/reservas",
+              "host": [ "{{bookingServiceBaseUrl}}" ],
+              "path": [ "api", "reservas" ]
+            },
+            "description": "RN-R01. Repite exactamente el mismo vehículo y periodo de la petición \"Crear reserva\" para forzar el solapamiento y demostrar el 409 Conflict con ProblemDetails."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('409 Conflict', () => pm.response.to.have.status(409));",
+                  "const body = pm.response.json();",
+                  "pm.test('la respuesta es un ProblemDetails de conflicto', () => {",
+                  "    pm.expect(body.status).to.eql(409);",
+                  "    pm.expect(body.type).to.be.a('string').and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
