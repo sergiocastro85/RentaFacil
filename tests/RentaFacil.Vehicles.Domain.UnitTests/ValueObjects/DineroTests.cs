@@ -24,6 +24,19 @@ public class DineroTests
         resultado.Value.Monto.Should().Be(0m);
     }
 
+    [Theory]
+    [InlineData("")]
+    [InlineData("CO")]
+    [InlineData("COPX")]
+    [InlineData("C0P")]
+    public void Create_ConMonedaInvalida_RetornaFallo(string moneda)
+    {
+        var resultado = Dinero.Create(100m, moneda);
+
+        resultado.IsFailure.Should().BeTrue();
+        resultado.Error.Should().Be(VehiculoErrors.TarifaInvalida);
+    }
+
     [Fact]
     public void Sumar_ConMonedasDistintas_RetornaFallo()
     {
@@ -34,5 +47,18 @@ public class DineroTests
 
         resultado.IsFailure.Should().BeTrue();
         resultado.Error.Should().Be(VehiculoErrors.TarifaInvalida);
+    }
+
+    [Fact]
+    public void Sumar_ConMonedasIguales_SumaLosMontos()
+    {
+        var dineroA = Dinero.Create(100m, "COP").Value;
+        var dineroB = Dinero.Create(50m, "COP").Value;
+
+        var resultado = dineroA.Sumar(dineroB);
+
+        resultado.IsSuccess.Should().BeTrue();
+        resultado.Value.Monto.Should().Be(150m);
+        resultado.Value.Moneda.Should().Be("COP");
     }
 }

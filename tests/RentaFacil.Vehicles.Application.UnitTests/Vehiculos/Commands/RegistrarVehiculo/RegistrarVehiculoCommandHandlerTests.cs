@@ -92,4 +92,36 @@ public class RegistrarVehiculoCommandHandlerTests
             repository => repository.AgregarAsync(It.IsAny<Vehiculo>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
+
+    [Fact]
+    public async Task Handle_ConPlacaInvalida_RetornaFalloDeDominioSinConsultarRepositorio()
+    {
+        var command = new RegistrarVehiculoCommand("AB", TipoVehiculo.SUV, "Toyota", "Fortuner", 2024, 100_000m, "COP");
+
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Be("Vehiculo.PlacaInvalida");
+        _vehiculoRepositoryMock.Verify(
+            repository => repository.ObtenerPorPlacaAsync(It.IsAny<Placa>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task Handle_ConMonedaInvalida_RetornaFalloDeDominio()
+    {
+        _vehiculoRepositoryMock
+            .Setup(repository => repository.ObtenerPorPlacaAsync(It.IsAny<Placa>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Vehiculo?)null);
+
+        var command = new RegistrarVehiculoCommand("ABC123", TipoVehiculo.SUV, "Toyota", "Fortuner", 2024, 100_000m, "XX");
+
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Be("Vehiculo.TarifaInvalida");
+        _vehiculoRepositoryMock.Verify(
+            repository => repository.AgregarAsync(It.IsAny<Vehiculo>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
 }

@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using RentaFacil.SharedKernel.Results;
 
 namespace RentaFacil.Vehicles.Application.Behaviors;
 
@@ -27,10 +28,21 @@ public sealed class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRe
         var response = await next();
         stopwatch.Stop();
 
-        _logger.LogInformation(
-            "Solicitud {RequestName} finalizada en {ElapsedMilliseconds} ms",
-            requestName,
-            stopwatch.ElapsedMilliseconds);
+        if (response is Result { IsFailure: true } resultadoFallido)
+        {
+            _logger.LogWarning(
+                "Solicitud {RequestName} finalizada con error en {ElapsedMilliseconds} ms: {ErrorCode}",
+                requestName,
+                stopwatch.ElapsedMilliseconds,
+                resultadoFallido.Error.Code);
+        }
+        else
+        {
+            _logger.LogInformation(
+                "Solicitud {RequestName} finalizada en {ElapsedMilliseconds} ms",
+                requestName,
+                stopwatch.ElapsedMilliseconds);
+        }
 
         return response;
     }

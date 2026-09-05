@@ -1,0 +1,104 @@
+Summary
+  Generated on: 4/09/2026 - 5:43:51 p. m.
+  Coverage date: 4/09/2026 - 5:43:38 p. m. - 4/09/2026 - 5:43:46 p. m.
+  Parser: MultiReport (5x Cobertura)
+  Assemblies: 6
+  Classes: 72
+  Files: 72
+  Line coverage: 61.2%
+  Covered lines: 1297
+  Uncovered lines: 822
+  Coverable lines: 2119
+  Total lines: 3323
+  Branch coverage: 78.1% (250 of 320)
+  Covered branches: 250
+  Total branches: 320
+  Method coverage: 70.3% (221 of 314)
+  Full method coverage: 68.7% (216 of 314)
+  Covered methods: 221
+  Fully covered methods: 216
+  Total methods: 314
+
+RentaFacil.Bookings.Application                                                                                                                   88.3%
+  RentaFacil.Bookings.Application.Abstractions.CupoReservadoDto                                                                                    100%
+  RentaFacil.Bookings.Application.Behaviors.LoggingBehavior<T1, T2>                                                                                  0%
+  RentaFacil.Bookings.Application.Behaviors.ValidationBehavior<T1, T2>                                                                             100%
+  RentaFacil.Bookings.Application.Clientes.Commands.RegistrarCliente.RegistrarClienteCommand                                                       100%
+  RentaFacil.Bookings.Application.Clientes.Commands.RegistrarCliente.RegistrarClienteCommandHandler                                                100%
+  RentaFacil.Bookings.Application.Clientes.Commands.RegistrarCliente.RegistrarClienteCommandValidator                                              100%
+  RentaFacil.Bookings.Application.DependencyInjection                                                                                                0%
+  RentaFacil.Bookings.Application.DTOs.ClienteResponse                                                                                              50%
+  RentaFacil.Bookings.Application.DTOs.HistorialReservaDto                                                                                        33.3%
+  RentaFacil.Bookings.Application.DTOs.ReporteDiarioDto                                                                                           87.5%
+  RentaFacil.Bookings.Application.DTOs.ReservaResponse                                                                                            37.5%
+  RentaFacil.Bookings.Application.Reportes.Commands.GenerarReporteDiario.GenerarReporteDiarioCommand                                               100%
+  RentaFacil.Bookings.Application.Reportes.Commands.GenerarReporteDiario.GenerarReporteDiarioCommandHandler                                        100%
+  RentaFacil.Bookings.Application.Reservas.Commands.CrearReserva.CrearReservaCommand                                                               100%
+  RentaFacil.Bookings.Application.Reservas.Commands.CrearReserva.CrearReservaCommandHandler                                                        100%
+  RentaFacil.Bookings.Application.Reservas.Commands.CrearReserva.CrearReservaCommandValidator                                                      100%
+  RentaFacil.Bookings.Application.Reservas.Queries.ObtenerHistorialPorCliente.ObtenerHistorialPorClienteQuery                                      100%
+  RentaFacil.Bookings.Application.Reservas.Queries.ObtenerHistorialPorCliente.ObtenerHistorialPorClienteQueryHandler                               100%
+  RentaFacil.Bookings.Application.Reservas.Queries.ObtenerHistorialPorCliente.ObtenerHistorialPorClienteQueryValidator                             100%
+
+RentaFacil.Bookings.Domain                                                                                                                          90%
+  RentaFacil.Bookings.Domain.Entities.Cliente                                                                                                     95.8%
+  RentaFacil.Bookings.Domain.Entities.ReporteReservasDiarias                                                                                       100%
+  RentaFacil.Bookings.Domain.Entities.Reserva                                                                                                      100%
+  RentaFacil.Bookings.Domain.Errors.ClienteErrors                                                                                                  100%
+  RentaFacil.Bookings.Domain.Errors.ReservaErrors                                                                                                  100%
+  RentaFacil.Bookings.Domain.Repositories.DesgloseTipoVehiculo                                                                                     100%
+  RentaFacil.Bookings.Domain.Repositories.ReporteAgregado                                                                                          100%
+  RentaFacil.Bookings.Domain.ValueObjects.Dinero                                                                                                    87%
+  RentaFacil.Bookings.Domain.ValueObjects.Documento                                                                                               82.6%
+  RentaFacil.Bookings.Domain.ValueObjects.Email                                                                                                   76.4%
+  RentaFacil.Bookings.Domain.ValueObjects.Periodo                                                                                                 83.3%
+  System.Text.RegularExpressions.Generated                                                                                                        86.7%
+  System.Text.RegularExpressions.Generated.<RegexGenerator_g>F0F6CD381BACB7DA89B7867C39F1373D8F9EBADAFA08A0E5704AE292687CA4FFD__FormatoValido_0   86.5%
+
+RentaFacil.Bookings.Infrastructure                                                                                                                19.7%
+  RentaFacil.Bookings.Infrastructure.DateTimeProvider                                                                                                0%
+  RentaFacil.Bookings.Infrastructure.DependencyInjection                                                                                             0%
+  RentaFacil.Bookings.Infrastructure.Http.VehicleCatalogHttpClient                                                                                   0%
+  RentaFacil.Bookings.Infrastructure.Persistence.BookingsDbContext                                                                                  44%
+  RentaFacil.Bookings.Infrastructure.Persistence.Configurations.ClienteConfiguration                                                              88.2%
+  RentaFacil.Bookings.Infrastructure.Persistence.Configurations.ReporteReservasDiariasConfiguration                                                100%
+  RentaFacil.Bookings.Infrastructure.Persistence.Configurations.ReservaConfiguration                                                               100%
+  RentaFacil.Bookings.Infrastructure.Persistence.Migrations.BookingsDbContextModelSnapshot                                                           0%
+  RentaFacil.Bookings.Infrastructure.Persistence.Migrations.InicialReservas                                                                          0%
+  RentaFacil.Bookings.Infrastructure.Persistence.Repositories.ClienteRepository                                                                      0%
+  RentaFacil.Bookings.Infrastructure.Persistence.Repositories.ReporteRepository                                                                    100%
+  RentaFacil.Bookings.Infrastructure.Persistence.Repositories.ReservaRepository                                                                      0%
+
+RentaFacil.SharedKernel                                                                                                                             45%
+  RentaFacil.SharedKernel.Primitives.AggregateRoot                                                                                                 100%
+  RentaFacil.SharedKernel.Primitives.Entity                                                                                                       23.8%
+  RentaFacil.SharedKernel.Primitives.ValueObject                                                                                                     0%
+  RentaFacil.SharedKernel.Results.Error                                                                                                            100%
+  RentaFacil.SharedKernel.Results.Result                                                                                                          77.7%
+  RentaFacil.SharedKernel.Results.Result<T>                                                                                                        100%
+
+RentaFacil.Vehicles.Application                                                                                                                   84.7%
+  RentaFacil.Vehicles.Application.Behaviors.LoggingBehavior<T1, T2>                                                                                  0%
+  RentaFacil.Vehicles.Application.Behaviors.ValidationBehavior<T1, T2>                                                                             100%
+  RentaFacil.Vehicles.Application.Bloqueos.Commands.CrearBloqueo.CrearBloqueoCommand                                                               100%
+  RentaFacil.Vehicles.Application.Bloqueos.Commands.CrearBloqueo.CrearBloqueoCommandHandler                                                        100%
+  RentaFacil.Vehicles.Application.Bloqueos.Commands.LiberarBloqueo.LiberarBloqueoCommand                                                           100%
+  RentaFacil.Vehicles.Application.Bloqueos.Commands.LiberarBloqueo.LiberarBloqueoCommandHandler                                                    100%
+  RentaFacil.Vehicles.Application.DependencyInjection                                                                                                0%
+  RentaFacil.Vehicles.Application.DTOs.BloqueoResponse                                                                                            44.4%
+  RentaFacil.Vehicles.Application.DTOs.VehiculoDisponibleDto                                                                                      42.8%
+  RentaFacil.Vehicles.Application.DTOs.VehiculoResponse                                                                                           37.5%
+  RentaFacil.Vehicles.Application.Vehiculos.Commands.RegistrarVehiculo.RegistrarVehiculoCommand                                                    100%
+  RentaFacil.Vehicles.Application.Vehiculos.Commands.RegistrarVehiculo.RegistrarVehiculoCommandHandler                                             100%
+  RentaFacil.Vehicles.Application.Vehiculos.Commands.RegistrarVehiculo.RegistrarVehiculoCommandValidator                                           100%
+  RentaFacil.Vehicles.Application.Vehiculos.Queries.ConsultarDisponibilidad.ConsultarDisponibilidadQuery                                           100%
+  RentaFacil.Vehicles.Application.Vehiculos.Queries.ConsultarDisponibilidad.ConsultarDisponibilidadQueryHandler                                    100%
+  RentaFacil.Vehicles.Application.Vehiculos.Queries.ConsultarDisponibilidad.ConsultarDisponibilidadQueryValidator                                  100%
+
+RentaFacil.Vehicles.Domain                                                                                                                          91%
+  RentaFacil.Vehicles.Domain.Entities.BloqueoDisponibilidad                                                                                       88.2%
+  RentaFacil.Vehicles.Domain.Entities.Vehiculo                                                                                                    97.6%
+  RentaFacil.Vehicles.Domain.Errors.VehiculoErrors                                                                                                 100%
+  RentaFacil.Vehicles.Domain.ValueObjects.Dinero                                                                                                  85.7%
+  RentaFacil.Vehicles.Domain.ValueObjects.Periodo                                                                                                 83.3%
+  RentaFacil.Vehicles.Domain.ValueObjects.Placa                                                                                                   83.3%

@@ -106,6 +106,66 @@ public class CrearReservaCommandHandlerTests
     }
 
     [Fact]
+    public async Task Handle_ConPeriodoInvalido_RetornaFalloYNoInvocaReservarCupo()
+    {
+        var cliente = CrearCliente();
+        var vehiculoId = Guid.NewGuid();
+
+        _clienteRepositoryMock
+            .Setup(repository => repository.ObtenerPorIdAsync(cliente.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(cliente);
+
+        // fechaInicio en el pasado respecto a FechaActual: viola RN-P02.
+        var command = new CrearReservaCommand(cliente.Id, vehiculoId, Hoy.AddDays(-1), Hoy.AddDays(5));
+
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Be("Reserva.PeriodoInvalido");
+        _vehicleCatalogServiceMock.Verify(
+            service => service.ReservarCupoAsync(
+                It.IsAny<Guid>(), It.IsAny<Periodo>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task Handle_ConFalloAlConstruirLaReserva_InvocaCompensacionYRetornaFallo()
+    {
+        var cliente = CrearCliente();
+        var vehiculoId = Guid.NewGuid();
+
+        _clienteRepositoryMock
+            .Setup(repository => repository.ObtenerPorIdAsync(cliente.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(cliente);
+
+        // El cupo vuelve con una moneda inválida: Reserva.Crear falla al construir el Dinero
+        // del snapshot, ya reservado el cupo remoto, así que debe compensarse.
+        var cupoInvalido = new CupoReservadoDto(Guid.NewGuid(), "ABC123", TipoVehiculo.SUV, 100_000m, "XX");
+        _vehicleCatalogServiceMock
+            .Setup(service => service.ReservarCupoAsync(
+                vehiculoId, It.IsAny<Periodo>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(cupoInvalido);
+
+        _vehicleCatalogServiceMock
+            .Setup(service => service.LiberarCupoAsync(vehiculoId, It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result.Success());
+
+        var command = CrearComando(cliente.Id, vehiculoId);
+
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Be("Reserva.TarifaInvalida");
+        _vehicleCatalogServiceMock.Verify(
+            service => service.LiberarCupoAsync(vehiculoId, It.IsAny<Guid>(), It.IsAny<CancellationToken>()),
+            Times.Once);
+        _reservaRepositoryMock.Verify(
+            repository => repository.AgregarAsync(It.IsAny<Reserva>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+        _unitOfWorkMock.Verify(unitOfWork => unitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
     public async Task Handle_ConVehiculoNoDisponible_PropagaConflictYNoPersisteNada()
     {
         var cliente = CrearCliente();

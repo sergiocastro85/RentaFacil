@@ -21,10 +21,10 @@ out/
 
 ## Pruebas y cobertura
 TestResults/
+coverage-raw/
 coverage*.json
 coverage*.xml
 coverage*.info
-docs/coverage/
 
 ## Logs
 logs/

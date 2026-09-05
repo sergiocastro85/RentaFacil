@@ -86,4 +86,19 @@ public class RegistrarClienteCommandHandlerTests
             repository => repository.AgregarAsync(It.IsAny<Cliente>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
+
+    [Fact]
+    public async Task Handle_ConDocumentoInvalido_RetornaFalloDeDominioSinConsultarRepositorio()
+    {
+        var command = new RegistrarClienteCommand(
+            "CC", "123ABC789", "Juan Pérez", "juan.perez@rentafacil.com", "3001234567");
+
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Be("Cliente.DocumentoInvalido");
+        _clienteRepositoryMock.Verify(
+            repository => repository.ObtenerPorDocumentoAsync(It.IsAny<Documento>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
 }

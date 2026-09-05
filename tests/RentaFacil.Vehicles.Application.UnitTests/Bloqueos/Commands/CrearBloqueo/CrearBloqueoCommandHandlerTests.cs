@@ -127,4 +127,23 @@ public class CrearBloqueoCommandHandlerTests
         vehiculo.Bloqueos.Should().HaveCount(1);
         _unitOfWorkMock.Verify(unitOfWork => unitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
+
+    [Fact]
+    public async Task Handle_ConPeriodoInvalido_RetornaFalloDeDominio()
+    {
+        var vehiculo = CrearVehiculo();
+        var fechaInicio = DateOnly.FromDateTime(FechaActual).AddDays(-1);
+
+        _vehiculoRepositoryMock
+            .Setup(repository => repository.ObtenerPorIdAsync(vehiculo.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(vehiculo);
+
+        var command = new CrearBloqueoCommand(vehiculo.Id, fechaInicio, fechaInicio.AddDays(5), Guid.NewGuid());
+
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Be("Vehiculo.PeriodoInvalido");
+        _unitOfWorkMock.Verify(unitOfWork => unitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+    }
 }
